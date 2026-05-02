@@ -30,7 +30,7 @@ app = FastAPI(lifespan=lifespan)
 # dictates front url that can access the beackend and do database operations 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["*"],
