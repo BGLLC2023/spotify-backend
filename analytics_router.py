@@ -91,13 +91,13 @@ async def ad_conversions(country_id: int, session: AsyncSession = Depends(get_as
         "ad_conversion_counts": ad_counversion_dict
     }
 
-# top 5 desired future feature by country
+# top 3 desired future feature by country
 
 @router.get("/desired-features/{country_id}", response_model=DesiredFeatures, status_code=status.HTTP_200_OK)
 async def desired_features(country_id:int, session: AsyncSession = Depends(get_async_session)):
     country = await get_country(country_id, session)
 
-    query = select(SpotifyUser.desired_future_feature, func.count(SpotifyUser.desired_future_feature).label('Desired_feature')).where(SpotifyUser.country_id == country_id).group_by(SpotifyUser.desired_future_feature).order_by(func.count(SpotifyUser.desired_future_feature).desc()).limit(5)
+    query = select(SpotifyUser.desired_future_feature, func.count(SpotifyUser.desired_future_feature).label('Desired_feature')).where(SpotifyUser.country_id == country_id).group_by(SpotifyUser.desired_future_feature).order_by(func.count(SpotifyUser.desired_future_feature).desc()).limit(3)
 
     result = await session.execute(query)
 
