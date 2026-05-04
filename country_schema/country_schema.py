@@ -19,3 +19,9 @@ class CountryCreate(Country):
 class CountryRead(Country):
     country_id: int
     country_name: str
+
+
+
+class CountrySubscriptionsRead(BaseModel):
+
+    subscriptions: dict

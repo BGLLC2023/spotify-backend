@@ -4,9 +4,10 @@ from models import Country, SpotifyUser
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from users_schema.user_schema import SpotifyUserRead, SpotifyUserCreate
-from country_schema.country_schema import CountryRead, CountryCreate
+from country_schema.country_schema import CountryRead, CountryCreate, CountrySubscriptionsRead
 from sqlalchemy import func # for aggregate functions like count, sum, avg, etc.
 from response_models.response_models import TopGenre, SubscriptionCount, AdConversions, DesiredFeatures
+from sqlalchemy import text
 
 
 
@@ -65,6 +66,23 @@ async def subscription_count_by_country(country_id: int, session: AsyncSession =
         "subscription_counts": subscription_counts_dict
     }
 
+# return a list oof users by country and ability to filter based on subscription type to visualize in a geo map
+@router.get("/subscription_map/{subscription_type}",response_model=CountrySubscriptionsRead, status_code= status.HTTP_200_OK)
+async def subscription_map(subscription_type: str, session: AsyncSession = Depends(get_async_session)):
+    query = select(
+        Country.country_name,
+        func.count(SpotifyUser.subscription_type).label('Subscription_count')
+        ).join(SpotifyUser, Country.country_id == SpotifyUser.country_id
+        ).where(SpotifyUser.subscription_type == subscription_type
+        ).group_by(Country.country_id)
+    results = await session.execute(query)
+    country_subscriptions = results.all()
+    country_subscriptions_dict = {country_name: count for country_name, count in country_subscriptions}
+
+    return {
+        "subscriptions": (country_subscriptions_dict)
+
+    }
 
 
 
